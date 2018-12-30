@@ -96,7 +96,7 @@ module.exports = (function () {
      *
      *
      */
-    ColorThief.prototype.getPalette = function (sourceImage, colorCount, quality) {
+    ColorThief.prototype.getPalette = function (sourceImage, colorCount, quality, minPixelCount) {
 
         if (typeof colorCount === 'undefined' || colorCount < 2 || colorCount > 256) {
             colorCount = 10;
@@ -121,7 +121,7 @@ module.exports = (function () {
             a = pixels[offset + 3];
             // If pixel is mostly opaque and not white
             if (a >= 125) {
-                if (!(r > 250 && g > 250 && b > 250)) {
+                if (!(r > 255 && g > 255 && b > 255)) {
                     pixelArray.push([r, g, b]);
                 }
             }
@@ -135,7 +135,8 @@ module.exports = (function () {
         // Clean up
         image.removeCanvas();
 
-        return palette;
+        //return (minPercentage > 0) ? palette.filter(color => (color[3] / pixelArray.length) * 100 >= minPercentage) : palette;
+        return (minPixelCount > 0) ? palette.filter(color => color[3] >= minPixelCount) : palette;
     };
 
     ColorThief.prototype.getColorFromUrl = function (imageUrl, callback, quality) {
@@ -186,7 +187,7 @@ module.exports = (function () {
     ColorThief.prototype.rgbToHex = function(red, green, blue) {
         var rgb = blue | (green << 8) | (red << 16);
         return '#' + (0x1000000 + rgb).toString(16).slice(1);
-    }
+    };
 
     /*!
      * quantize.js Copyright 2008 Nick Rabinowitz.
